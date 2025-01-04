@@ -11,7 +11,8 @@ public:
     void draw();
 
 private:
-    unsigned int width, height;
+    int width, height;
     char** data = nullptr;
     void destroyData();
+    void drawCircle();
 };
