@@ -86,7 +86,7 @@ void Graphic::drawHand(int lengthPercent, int angle, char character)
     float slope;
     if(targetPos.x == 0) slope = ((targetPos.y >= 0)? -origin.y-1 : origin.y-1); //target pos = how much you add to origin
     else
-        slope = (targetPos.y) / (float)(targetPos.x);
+        slope = (targetPos.y) / (float)(targetPos.x-1);
 
     float verticalAccumulator = 0;
 
@@ -102,11 +102,11 @@ void Graphic::drawHand(int lengthPercent, int angle, char character)
             int roundedSlope = (int)std::roundf(slope);
             int roundedAccum = (int)std::roundf(verticalAccumulator);
             for(int y = 1; y < std::abs(roundedSlope); y++){
-                data[placePos.x][placePos.y + ((roundedAccum > 0)? -y : y)] = character; //error because you should not be taking nums at start
+                data[placePos.x][placePos.y + ((roundedAccum > 0)? -y : y)] = character; //error because you should not be minusing nums at start
             }
         }
         x++;
-    }while(x < std::abs(targetPos.x));
+    } while(x < std::abs(targetPos.x));
 }
 
 void Graphic::drawTime(const Time& time){
