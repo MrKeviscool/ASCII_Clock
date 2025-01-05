@@ -3,6 +3,12 @@
 #include <cstring>
 #include <iostream>
 #include <cmath>
+#include "Time.hpp"
+
+const int
+    HOUR_HAND_LEN   = 50,    
+    MINUTE_HAND_LEN = 80,  
+    SECOND_HAND_LEN = 100;
 
 Graphic::Graphic(){
     setScreenSize(40, 20);
@@ -29,7 +35,7 @@ void Graphic::clearGraphics(){
 }
 
 void Graphic::destroyData(){
-    if(!data) return;
+    if(!data)return;
     for(int i = 0; i < width; i++)
         delete[] data[i];
     delete[] data;
@@ -37,6 +43,7 @@ void Graphic::destroyData(){
 }
 
 void Graphic::draw(){
+    drawTime(Time{});
     for(int y = 0; y < height; y++){
         for(int x = 0; x < width; x++)
             std::cout << data[x][y];
@@ -46,10 +53,56 @@ void Graphic::draw(){
 
 void Graphic::drawCircle(){
     for(int i = 0; i < 360; i++){
-        const Vector2 newPxPos{
-            int(std::roundf(std::cos((float)i * (M_PIf / 180.0f)) *  ((width-1)/2.0f)) + (width-1)/2.0f),
-            int(std::roundf(std::sin((float)i * (M_PIf / 180.0f)) * ((height-1)/2.0f)) + (height-1)/2.0f)
-        };
+        const Vector2i newPxPos{
+            int(std::roundf(std::cos((float)i * (M_PIf / 180.0f)) * ((width - 1) / 2.0f)) + (width - 1) / 2.0f),
+            int(std::roundf(std::sin((float)i * (M_PIf / 180.0f)) * ((height - 1) / 2.0f)) + (height - 1) / 2.0f)};
         data[newPxPos.x][newPxPos.y] = 'O';
     }
+}
+
+Vector2i Graphic::getSize(){
+    return {width, height};
+}
+
+void Graphic::drawHand(int lengthPercent, int angle)
+{
+
+    const Vector2i origin{
+        width/2,
+        height/2
+    };
+
+    const Vector2i targetPos{
+        static_cast<int>(std::roundf(std::cos(((float)angle - 90) * (M_PIf / 180.0f)) * origin.x * (lengthPercent / 100.0f))),
+        static_cast<int>(std::roundf(std::sin(((float)angle - 90) * (M_PIf / 180.0f)) * origin.y * (lengthPercent / 100.0f))),
+    };
+
+    float slope;
+    if(targetPos.x == 0) slope = ((targetPos.y >= 0)? -origin.y-1 : origin.y-1); //target pos = how much you add to origin
+    else
+        slope = (targetPos.y) / (float)(targetPos.x);
+
+    float verticalAccumulator = 0;
+
+    int x = 0;
+    do{
+        const Vector2i placePos{
+            origin.x + (targetPos.x > 0? x : -x),
+            origin.y + (int)(targetPos.x > 0? std::roundf(verticalAccumulator) : -std::roundf(verticalAccumulator))
+        };
+        verticalAccumulator += slope;
+        data[placePos.x][placePos.y] = 'H';
+        {
+            int roundedSlope = (int)std::roundf(slope);
+            int roundedAccum = (int)std::roundf(verticalAccumulator);
+            for(int y = 1; y < std::abs(roundedSlope)+1; y++){
+                data[placePos.x][placePos.y + (std::roundf(roundedAccum) > 0? -y : y)] = 'H';
+            }
+        }
+        x++;
+    }while(x < std::abs(targetPos.x));
+}
+
+void Graphic::drawTime(const Time &time){
+    drawHand(100, 0);
 }
