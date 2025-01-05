@@ -8,7 +8,7 @@ public:
 
     Time time;
 
-    const Time getTime();
+    const Time& getTime();
     void updateTime();
     void setTimeZone(const float UTCOffset);
 

@@ -5,14 +5,20 @@
 #include <cmath>
 #include "Time.hpp"
 
+extern const float map(const float val, const float inMin, const float inMax, const float outMin, const float outMax);
+
 const int
     HOUR_HAND_LEN   = 50,    
     MINUTE_HAND_LEN = 80,  
     SECOND_HAND_LEN = 100;
 
 Graphic::Graphic(){
-    setScreenSize(40, 20);
+
 };
+
+Graphic::Graphic(int width, int height) : width(width), height(height){
+    setScreenSize(width, height);
+}
 
 Graphic::~Graphic(){
     destroyData();
@@ -31,6 +37,7 @@ void Graphic::setScreenSize(const int screenWidth, const int screenHeight){
 void Graphic::clearGraphics(){
     for(int i = 0; i < width; i++)
         std::memset(data[i], ' ', height);
+    std::system("clear");
     drawCircle();
 }
 
@@ -43,7 +50,6 @@ void Graphic::destroyData(){
 }
 
 void Graphic::draw(){
-    drawTime(Time{});
     for(int y = 0; y < height; y++){
         for(int x = 0; x < width; x++)
             std::cout << data[x][y];
@@ -64,7 +70,7 @@ Vector2i Graphic::getSize(){
     return {width, height};
 }
 
-void Graphic::drawHand(int lengthPercent, int angle)
+void Graphic::drawHand(int lengthPercent, int angle, char character)
 {
 
     const Vector2i origin{
@@ -91,18 +97,21 @@ void Graphic::drawHand(int lengthPercent, int angle)
             origin.y + (int)(targetPos.x > 0? std::roundf(verticalAccumulator) : -std::roundf(verticalAccumulator))
         };
         verticalAccumulator += slope;
-        data[placePos.x][placePos.y] = 'H';
+        data[placePos.x][placePos.y] = character;
         {
             int roundedSlope = (int)std::roundf(slope);
             int roundedAccum = (int)std::roundf(verticalAccumulator);
-            for(int y = 1; y < std::abs(roundedSlope)+1; y++){
-                data[placePos.x][placePos.y + (std::roundf(roundedAccum) > 0? -y : y)] = 'H';
+            for(int y = 1; y < std::abs(roundedSlope); y++){
+                data[placePos.x][placePos.y + ((roundedAccum > 0)? -y : y)] = character; //error because you should not be taking nums at start
             }
         }
         x++;
     }while(x < std::abs(targetPos.x));
 }
 
-void Graphic::drawTime(const Time &time){
-    drawHand(100, 0);
+void Graphic::drawTime(const Time& time){
+    clearGraphics();
+    drawHand(100, (int)map(time.second, 0, 60, 0, 360), 'S');
+    drawHand(100, (int)map(time.minute, 0, 60, 0, 360), 'M');
+    drawHand(100, (int)map(time.hour  , 0, 12, 0, 360), 'H');
 }
