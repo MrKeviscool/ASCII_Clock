@@ -98,10 +98,10 @@ void Graphic::drawHand(int lengthPercent, int angle, char character)
         };
         verticalAccumulator += slope;
         data[placePos.x][placePos.y] = character;
-        {
+        if(x != 0 || targetPos.x < 2){
             int roundedSlope = (int)std::roundf(slope);
             int roundedAccum = (int)std::roundf(verticalAccumulator);
-            for(int y = 1; y < std::abs(roundedSlope); y++){
+            for(int y = 1; y < std::abs(roundedSlope)+1; y++){
                 data[placePos.x][placePos.y + ((roundedAccum > 0)? -y : y)] = character; //error because you should not be minusing nums at start
             }
         }
