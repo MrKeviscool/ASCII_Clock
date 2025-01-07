@@ -20,7 +20,7 @@ print a analog clock based on system time to terminal\n\
 \n\
 Options:\n\
  -h, --help      this help message\n\
- -o, --offset[N] set GTC timezone offset to N (float)\n";
+ -o, --offset [N] set GTC timezone offset to N (float)\n";
 
 const char argError[] = "argument error, type \'-h\' or \'--help\' for help\n\n";
 
@@ -32,8 +32,10 @@ int main(int argc, char** argv){
 
     try{
         if(argc == 2){
-            if(!std::strcmp(argv[1], "-h") || !std::strcmp(argv[1], "--help"))
+            if(!std::strcmp(argv[1], "-h") || !std::strcmp(argv[1], "--help")){
                 std::cout << helpMsg;
+                return 0;
+            }
             else throw std::invalid_argument("invalid arguments");
         }
         else if(argc > 2){
